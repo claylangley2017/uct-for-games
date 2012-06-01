@@ -104,13 +104,6 @@ public abstract class MCTSPlayer implements Player
          curState = best.getState();
          curNode = best;
       }
-      if (player1) {
-         System.out.print("player1 : ");
-      } else {
-         System.out.print("player2 : ");
-      }
-      System.out.println(g.gameStatus(curState));
-      g.printState(curState);
    }
 
    /**

@@ -133,21 +133,18 @@ public class MCTSNode
     */
    public MCTSNode bestMove()
    {
-      System.out.println();
       float max = -Float.MAX_VALUE;
       int maxIndex = r.nextInt(nextMoves.size());
       float randomizer;
       for (int i = 0; i < nextMoves.size(); i++) {
          MCTSNode node = nextMoves.get(i);
          float nodeScore = (float) node.getScore() / (float) node.getTimesVisited();
-         System.out.print(i + ": " + nodeScore + ", ");
          randomizer = Float.MIN_VALUE * r.nextInt(nextMoves.size() * nextMoves.size());
          if (nodeScore + randomizer > max) {
             max = nodeScore + randomizer;
             maxIndex = i;
          }
       }
-      System.out.println("Selecting node " + maxIndex);
       return nextMoves.get(maxIndex);
    }
 
