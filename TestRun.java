@@ -42,14 +42,16 @@ public class TestRun
 
    /**
     * A simple main function that allows different player types to play games
-    * against each other.
+    * against each other. Different permutations can be tried by adjusting
+    * the hardcoded think times or by swapping out different games and players
+    * as g, p1, and p2, respectively.
     *
     * @param args
     */
    public static void main(String args[])
    {
-      //Game g = new TicTacToe();
-      Game g = new ConnectFour();
+      Game g = new TicTacToe();
+      //Game g = new ConnectFour();
       Player p1, p2;
 
       int p1Wins = 0, p2Wins = 0, draws = 0;
@@ -61,13 +63,19 @@ public class TestRun
          p2 = new RandomRolloutPlayer(g, false, 500);
          while (g.gameStatus(p2.getCurState()) == Game.status.ONGOING) {
             //p1 goes
+            System.out.println("Player 1's turn:");
             p1.MakeMove();
             p2.updateGameState(p1.getCurState());
+            g.printState(p1.getCurState());
+            System.out.println("Status is " + g.gameStatus(p1.getCurState()));
 
 
             //p2 goes
+            System.out.println("Player 1's turn:");
             p2.MakeMove();
             p1.updateGameState(p2.getCurState());
+            g.printState(p1.getCurState());
+            System.out.println("Status is " + g.gameStatus(p1.getCurState()));
          }
 
          if (g.gameStatus(p2.getCurState()) == Game.status.DRAW) {
