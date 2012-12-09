@@ -38,7 +38,9 @@
  *
  * @author Kyle
  */
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -81,19 +83,21 @@ public class HumanPlayer implements Player
          try {
             ArrayList<? extends GameState> moves = g.getPossibleMoves(curState);
             System.out.print("Enter Move #: ");
-            int move = System.in.read() - '0';
+            BufferedReader inputStream = new BufferedReader(new InputStreamReader(System.in));
+            String moveStr = inputStream.readLine();
+            int move = Integer.parseInt(moveStr) % moves.size();
             curState = moves.get(move);
             System.in.read();
          } catch (IOException ex) {
             Logger.getLogger(HumanPlayer.class.getName()).log(Level.SEVERE, null, ex);
          }
       }
-      if (player1) {
-         System.out.print("player1 : ");
-      } else {
-         System.out.print("player2 : ");
-      }
-      System.out.println(g.gameStatus(curState));
-      g.printState(curState);
+//      if (player1) {
+//         System.out.print("player1 : ");
+//      } else {
+//         System.out.print("player2 : ");
+//      }
+//      System.out.println(g.gameStatus(curState));
+//      g.printState(curState);
    }
 }
