@@ -47,7 +47,8 @@ public class MCTSNode
    private GameState nodeGameState;
    private float score;
    private int timesVisisted;
-   private Random r;
+   private final Random r;
+   private boolean expanded = false;
 
    /**
     * Instantiates an MCTSNode and initializes ranking variables.
@@ -60,7 +61,7 @@ public class MCTSNode
       timesVisisted = 0;
       score = 0;
       nextMoves = null;
-      r = new Random(System.currentTimeMillis());
+      r = new Random();
    }
 
    /**
@@ -69,11 +70,15 @@ public class MCTSNode
     * @param possibleMoves The list of move to be added as child nodes to this
     * node.
     */
-   public void expand(ArrayList<? extends GameState> possibleMoves)
+   public synchronized void expand(ArrayList<? extends GameState> possibleMoves)
    {
-      nextMoves = new ArrayList<MCTSNode>();
-      for (GameState s : possibleMoves) {
-         nextMoves.add(new MCTSNode(s));
+      if (!expanded)
+      {
+         expanded = true;
+         nextMoves = new ArrayList<MCTSNode>();
+         for (GameState s : possibleMoves) {
+            nextMoves.add(new MCTSNode(s));
+         }
       }
    }
 
@@ -138,7 +143,7 @@ public class MCTSNode
       float randomizer;
       for (int i = 0; i < nextMoves.size(); i++) {
          MCTSNode node = nextMoves.get(i);
-         float nodeScore = (float) node.getScore() / (float) node.getTimesVisited();
+         float nodeScore = (float) node.getScore() / ((float) (node.getTimesVisited() + Float.MIN_VALUE));
          randomizer = Float.MIN_VALUE * r.nextInt(nextMoves.size() * nextMoves.size());
          if (nodeScore + randomizer > max) {
             max = nodeScore + randomizer;
@@ -184,15 +189,25 @@ public class MCTSNode
     *
     * @param score the new score to be set for this node.
     */
-   public void setScore(float score)
-   {
-      this.score = score;
-   }
+//   public void setScore(float score)
+//   {
+//      this.score = score;
+//   }
 
+   public synchronized void incScore()
+   {
+      score++;
+   }
+   
+   public synchronized void decScore()
+   {
+      score--;
+   }   
+   
    /**
     * Increases the number of visits recorded to this node by one.
     */
-   public void visit()
+   public synchronized void visit()
    {
       timesVisisted++;
    }
