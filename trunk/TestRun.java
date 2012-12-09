@@ -39,6 +39,9 @@
  */
 public class TestRun
 {
+   
+//   public static long startTime = 0;
+//   public static long endTime = 0;
 
    /**
     * A simple main function that allows different player types to play games
@@ -50,17 +53,19 @@ public class TestRun
     */
    public static void main(String args[])
    {
-      Game g = new TicTacToe();
+      //Game g = new TicTacToe();
       //Game g = new ConnectFour();
+      Game g = new Go(7);
       Player p1, p2;
 
       int p1Wins = 0, p2Wins = 0, draws = 0;
 
       for (int i = 0; i < 100; i++) {
-         p1 = new RandomRolloutPlayer(g, true, 500);
+         p1 = new DeathDetectingRollout(g, true, 3000);
          //p1 = new HumanPlayer(g, true);
-         //p1 = new RandomPlayer(g, true);
-         p2 = new RandomRolloutPlayer(g, false, 500);
+         //p2 = new HumanPlayer(g, false);
+         //p1 = new RandomPlayer(g, false);
+         p2 = new DeathDetectingRollout(g, false, 3000);
          while (g.gameStatus(p2.getCurState()) == Game.status.ONGOING) {
             //p1 goes
             System.out.println("Player 1's turn:");
@@ -69,13 +74,15 @@ public class TestRun
             g.printState(p1.getCurState());
             System.out.println("Status is " + g.gameStatus(p1.getCurState()));
 
-
-            //p2 goes
-            System.out.println("Player 1's turn:");
-            p2.MakeMove();
-            p1.updateGameState(p2.getCurState());
-            g.printState(p1.getCurState());
-            System.out.println("Status is " + g.gameStatus(p1.getCurState()));
+            if (g.gameStatus(p2.getCurState()) == Game.status.ONGOING)
+            {
+               //p2 goes
+               System.out.println("Player 2's turn:");
+               p2.MakeMove();
+               p1.updateGameState(p2.getCurState());
+               g.printState(p1.getCurState());
+               System.out.println("Status is " + g.gameStatus(p1.getCurState()));
+            }
          }
 
          if (g.gameStatus(p2.getCurState()) == Game.status.DRAW) {

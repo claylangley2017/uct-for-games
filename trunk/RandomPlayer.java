@@ -76,13 +76,13 @@ public class RandomPlayer implements Player
             curState = finisher;
          }
       }
-      if (player1) {
-         System.out.print("player1 : ");
-      } else {
-         System.out.print("player2 : ");
-      }
-      System.out.println(g.gameStatus(curState));
-      g.printState(curState);
+//      if (player1) {
+//         System.out.print("player1 : ");
+//      } else {
+//         System.out.print("player2 : ");
+//      }
+//      System.out.println(g.gameStatus(curState));
+//      g.printState(curState);
    }
 
    /**

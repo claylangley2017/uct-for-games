@@ -32,19 +32,17 @@
  * The Netherlands.
  */
 /**
- * An MCTSPlayer with a purely random rollout for hte simulation phase. This
- * player employs no game-specific heuritics, nor does it take special action
- * for moves that are garaunteed to win or lose.
+ * An MCTSPlayer that detects game-ending moves in the simulation phase.
  *
  * @author Kyle
  */
 import java.util.ArrayList;
 import java.util.Random;
 
-public class RandomRolloutPlayer extends MCTSPlayer
+public class DeathDetectingRollout extends MCTSPlayer
 {
 
-   public RandomRolloutPlayer(Game g, boolean player1, int thinkTime)
+   public DeathDetectingRollout(Game g, boolean player1, int thinkTime)
    {
       super(g, player1, thinkTime);
    }
@@ -55,14 +53,21 @@ public class RandomRolloutPlayer extends MCTSPlayer
     * @param state The state to be simulated from.
     * @return the game status at the end of the simulation.
     */
+   private int simCounter = 0;
    @Override
    protected Game.status simulateFrom(GameState state, boolean myTurn)
    {
+      simCounter++;
+      //TestRun.startTime = System.currentTimeMillis();
       Game.status s = g.gameStatus(state);
+      //if (System.currentTimeMillis() - TestRun.startTime > 100)
+            //System.out.print("CHECK: " + (System.currentTimeMillis() - TestRun.startTime) + " ");
       if (s != Game.status.ONGOING) {
+         //System.out.print("(" + simCounter + ") ");
+         simCounter = 0;
          return s;
       } else {
-         return simulateFrom(getRandomMoveFrom(state), !myTurn);
+         return simulateFrom(getMoveFrom(state, myTurn), !myTurn);
       }
    }
 
@@ -72,10 +77,23 @@ public class RandomRolloutPlayer extends MCTSPlayer
     * @param gameState a game state from which a random child state is desired.
     * @return a random child state of the passed state.
     */
-   private GameState getRandomMoveFrom(GameState gameState)
+   private GameState getMoveFrom(GameState gameState, boolean myTurn)
    {
+      //TestRun.startTime = System.currentTimeMillis();
       ArrayList<? extends GameState> moves = g.getPossibleMoves(gameState);
+      //if (System.currentTimeMillis() - TestRun.startTime > 100)
+                     //System.out.print("CHECK_TWO: " + (System.currentTimeMillis() - TestRun.startTime) + " ");                           
       Random rand = new Random();
+      if (myTurn) //if it's my turn, and I can win, do it.
+         for (int i = 0; i < moves.size(); i++)
+            if (IWin(g.gameStatus(moves.get(i))))
+            {
+               return moves.get(i);
+            }
+      if (!myTurn) //if it's their turn, and they can win, they will.
+         for (int i = 0; i < moves.size(); i++)
+            if (ILose(g.gameStatus(moves.get(i))))
+               return moves.get(i);
       int r = rand.nextInt(moves.size());
       return moves.get(r);
    }

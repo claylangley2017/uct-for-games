@@ -31,52 +31,76 @@
  * Intelligence and Interactive Digital Entertainment Conference, Maastricht,
  * The Netherlands.
  */
+import java.util.HashMap;
+import java.util.HashSet;
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 /**
- * An MCTSPlayer with a purely random rollout for hte simulation phase. This
- * player employs no game-specific heuritics, nor does it take special action
- * for moves that are garaunteed to win or lose.
  *
  * @author Kyle
  */
-import java.util.ArrayList;
-import java.util.Random;
+public class GoRegionTracker {
 
-public class RandomRolloutPlayer extends MCTSPlayer
-{
+      
+   private final HashSet<Integer> black = new HashSet<>();
+   private final HashSet<Integer> white = new HashSet<>();
+   private final HashSet<Integer> neutral = new HashSet<>();
+   private final HashSet<Integer> hasLiberty = new HashSet<>();
+   private final HashSet<Integer> touchedBlack = new HashSet<>();
+   private final HashSet<Integer> touchedWhite = new HashSet<>();
+   private final HashMap<Integer, Integer> regionCounts = new HashMap<>();
 
-   public RandomRolloutPlayer(Game g, boolean player1, int thinkTime)
+   public HashSet<Integer> getBlack()
    {
-      super(g, player1, thinkTime);
+      return black;
    }
 
-   /**
-    * Simulates a random play-through from a given state and returns the result.
-    *
-    * @param state The state to be simulated from.
-    * @return the game status at the end of the simulation.
-    */
-   @Override
-   protected Game.status simulateFrom(GameState state, boolean myTurn)
+   public HashSet<Integer> getHasLiberty()
    {
-      Game.status s = g.gameStatus(state);
-      if (s != Game.status.ONGOING) {
-         return s;
-      } else {
-         return simulateFrom(getRandomMoveFrom(state), !myTurn);
-      }
+      return hasLiberty;
    }
 
-   /**
-    * Gets a random move from a given state.
-    *
-    * @param gameState a game state from which a random child state is desired.
-    * @return a random child state of the passed state.
-    */
-   private GameState getRandomMoveFrom(GameState gameState)
+   public HashSet<Integer> getNeutral()
    {
-      ArrayList<? extends GameState> moves = g.getPossibleMoves(gameState);
-      Random rand = new Random();
-      int r = rand.nextInt(moves.size());
-      return moves.get(r);
+      return neutral;
    }
+
+   public HashMap<Integer, Integer> getRegionCounts()
+   {
+      return regionCounts;
+   }
+
+   public HashSet<Integer> getTouchedBlack()
+   {
+      return touchedBlack;
+   }
+
+   public HashSet<Integer> getTouchedWhite()
+   {
+      return touchedWhite;
+   }
+
+   public HashSet<Integer> getWhite()
+   {
+      return white;
+   }
+   
+   
+   public void clear()
+   {
+      black.clear();
+      white.clear();
+      neutral.clear();
+      hasLiberty.clear();
+      touchedBlack.clear();
+      touchedWhite.clear();         
+      regionCounts.clear();
+   }
+   
+   
+   
 }

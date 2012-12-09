@@ -40,10 +40,10 @@
 public abstract class MCTSPlayer implements Player
 {
 
-   protected Game g;
-   protected boolean player1;
+   final protected Game g;
+   final protected boolean player1;
    protected GameState curState;
-   private MCTSNode gameTree;
+   //private MCTSNode gameTree;
    private MCTSNode curNode;
    private int thinkTime;
 
@@ -71,8 +71,10 @@ public abstract class MCTSPlayer implements Player
       this.g = g;
       this.player1 = player1;
       curState = g.getStartingState();
-      gameTree = new MCTSNode(curState);
-      curNode = gameTree;
+      //gameTree = new MCTSNode(curState);
+      //curNode = gameTree;
+      curNode = new MCTSNode(curState);
+      
       curNode.expand(g.getPossibleMoves(curNode.getState()));
       this.thinkTime = thinkTime;
 
@@ -95,10 +97,62 @@ public abstract class MCTSPlayer implements Player
    @Override
    public void MakeMove()
    {
-      long endTime = System.currentTimeMillis() + thinkTime;
-      while (System.currentTimeMillis() < endTime) {
+      final long startTime = System.currentTimeMillis();
+      final long endTime = startTime + thinkTime;
+      int trials = 0;
+      Thread a = new Thread(){
+         @Override
+        public void run()
+        {
+           int extraTrials = 0;
+            while (System.currentTimeMillis() < endTime) //(trials < 4000)
+            {
+               runTrial(curNode, true);
+               extraTrials++;
+            }           
+            System.out.println("Ran " + extraTrials + " trials in " + (System.currentTimeMillis() - startTime)  + "ms.");
+        }
+      };
+      a.start();
+      
+      
+      Thread b = new Thread(){
+         @Override
+        public void run()
+        {
+           int extraTrials = 0;
+            while (System.currentTimeMillis() < endTime) //(trials < 4000)
+            {
+               runTrial(curNode, true);
+               extraTrials++;
+            }           
+            System.out.println("Ran " + extraTrials + " trials in " + (System.currentTimeMillis() - startTime)  + "ms.");
+        }
+      };
+      b.start();
+      
+      Thread c = new Thread(){
+         @Override
+        public void run()
+        {
+           int extraTrials = 0;
+            while (System.currentTimeMillis() < endTime) //(trials < 4000)
+            {
+               runTrial(curNode, true);
+               extraTrials++;
+            }           
+            System.out.println("Ran " + extraTrials + " trials in " + (System.currentTimeMillis() - startTime)  + "ms.");
+        }
+      };
+      c.start();    
+      
+      
+      while (System.currentTimeMillis() < endTime || a.isAlive() || b.isAlive() || c.isAlive()) //(trials < 4000)
+      {
          runTrial(curNode, true);
+         trials++;
       }
+      System.out.println("Ran " + trials + " trials in " + (System.currentTimeMillis() - startTime)  + "ms.");
       if (g.gameStatus(curState) == Game.status.ONGOING) {
          MCTSNode best = curNode.bestMove();
          curState = best.getState();
@@ -119,8 +173,10 @@ public abstract class MCTSPlayer implements Player
     * @param myTurn Whether it is this players turn or not.
     * @return The status of the trial.
     */
+   private int selectCount = 0;
    private Game.status runTrial(MCTSNode node, boolean myTurn)
    {
+      //selectCount++;
       Game.status returnStatus;
       node.visit();
       if (!node.isLeaf()) {
@@ -134,14 +190,22 @@ public abstract class MCTSPlayer implements Player
             node.visit();
          }
          //simulation
-         returnStatus = simulateFrom(node.getState());
+         //TestRun.startTime = System.currentTimeMillis();
+         returnStatus = simulateFrom(node.getState(), myTurn);
+         //if (System.currentTimeMillis() - TestRun.startTime > 200)
+           // System.out.print("CHECK: " + (System.currentTimeMillis() - TestRun.startTime) + " ");
+         //if (selectCount > 5)
+            //System.out.print(selectCount + " ");
+         //selectCount = 0;
       }
       //backpropogation
       if (IWin(returnStatus)) {
-         node.setScore(node.getScore() + 1);
+         //node.setScore(node.getScore() + 1);
+         node.incScore();
       }
       if (ILose(returnStatus)) {
-         node.setScore(node.getScore() - 1);
+         //node.setScore(node.getScore() - 1);
+         node.decScore();
       }
       return returnStatus;
 
@@ -180,5 +244,5 @@ public abstract class MCTSPlayer implements Player
     * @param state the state to be simulated from.
     * @return the resulting status of the simulation.
     */
-   protected abstract Game.status simulateFrom(GameState state);
+   protected abstract Game.status simulateFrom(GameState state, boolean myTurn);
 }
