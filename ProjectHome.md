@@ -1,0 +1,1 @@
+This project contains classes for easily implementing AI for a finite-state game. Implementations of Tic Tac Toe and Connect Four are included as samples, but the Monte Carlo Tree Search and the UCT algorithm used was designed for games with a very high game tree complexity, such as Go.
